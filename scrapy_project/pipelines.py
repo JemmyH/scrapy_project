@@ -56,7 +56,7 @@ class MzituItemPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',
-            'Referer': 'http://www.mzitu.com/'  # 这个太重要了！！！！！因为mmjpg的反爬虫措施就是根据referer来判断的！一般填写主域名就可以了
+            'Referer': 'http://www.mzitu.com/'
         }
         print("开始请求源代码", item['url'])
         print(item['item'], item['title'], item['name'], item['url'])
@@ -95,7 +95,7 @@ class PpmsgItemPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',
-            'Referer': 'http://www.ppmsg.org/'  # 这个太重要了！！！！！因为mmjpg的反爬虫措施就是根据referer来判断的！一般填写主域名就可以了
+            'Referer': 'http://www.ppmsg.org/'
         }
         print("开始请求源代码", item['url'])
         print(item['item'], item['title'], item['name'], item['url'])
