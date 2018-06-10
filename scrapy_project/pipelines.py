@@ -7,17 +7,17 @@
 """
 这里需要注意的是：如果想要下载的文件按照类别存放到不同的文件夹，比如图片，我这里采用的方法是使用shutil包的move方法
 """
-import os
-import scrapy
-import shutil
-from scrapy.pipelines.images import ImagesPipeline
-from scrapy.utils.project import get_project_settings
-import pymysql
+import os  # 主要用于创建本地文件夹
+import scrapy  # 不解释
+import shutil  # 用于将文件移动到特定文件夹。我们下载图片之后按照类别分类就是使用这个包
+from scrapy.pipelines.images import ImagesPipeline  # 使用scrapy的图片管道来下载图片
+from scrapy.utils.project import get_project_settings  # 获取本地的IMAGES_STORE地址
+import pymysql  # 连接mysql数据库
 
 
 class MmjpgItemPipeline(ImagesPipeline):
     # mmjpg 项目的pipeline
-    path = get_project_settings().get('IMAGES_STORE')
+    path = get_project_settings().get('IMAGES_STORE')  # F:\\image\\
     file_store = path + "www.mmjpg.com\\"  # 图片储存地址
 
     def get_media_requests(self, item, info):
@@ -30,7 +30,7 @@ class MmjpgItemPipeline(ImagesPipeline):
         yield scrapy.Request(item['url'], headers=headers)  # 将源文件下载并保存在默认路径的full文件夹里
 
     def item_completed(self, results, item, info):
-        # 每爬完一个项目（下载完成一张图片）
+        # 每爬完一个项目（下载完成一张图片）就会执行这个函数
         print("finished")
         file_path = [x["path"] for ok, x in results if ok][0].split("/")
         print(file_path)  # 查找下载的图片在本地full文件夹中的位置和名字 比如['full', '0264d064a89e55b564f773d4b60496499b1a316c.jpg']
@@ -41,7 +41,7 @@ class MmjpgItemPipeline(ImagesPipeline):
             print(f_p + "创建成功")
         print(shutil.move(self.path + file_path[0] + "\\" + file_path[1],
                           f_p + "\\" + item['name']))  # 分级创建目录的核心代码，即将图片移动到响应的目录中去
-        item['title'] = f_p + "\\" + item['name']
+        item['title'] = f_p + "\\" + item['name']  # 更新item，防止再次进行此次操作引起空值错误
         return item
 
     def close_spider(self):
@@ -56,7 +56,7 @@ class MzituItemPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',
-            'Referer': 'http://www.mzitu.com/'
+            'Referer': 'http://www.mzitu.com/'  # mzitu的反爬虫策略也是根据referer来的
         }
         print("开始请求源代码", item['url'])
         print(item['item'], item['title'], item['name'], item['url'])
@@ -73,7 +73,7 @@ class MzituItemPipeline(ImagesPipeline):
             os.mkdir(f_i_p)
             print(f_i_p + "创建成功")
         f_p = "{0}{1}\{2}\\".format(self.file_store, item['item'],
-                                    item['title'])  # 根据图片的标题创建响应的目录 比如F:\image\www.mmjpg.com\qingchun\粉嫩妹子一薰白嫩美臀诱惑无比
+                                    item['title'])
         print("f_p:" + f_p)
         if not os.path.exists(f_p):
             os.mkdir(f_p)
@@ -95,7 +95,7 @@ class PpmsgItemPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',
-            'Referer': 'http://www.ppmsg.org/'
+            'Referer': 'http://www.ppmsg.org/'  # 例行写上referer
         }
         print("开始请求源代码", item['url'])
         print(item['item'], item['title'], item['name'], item['url'])
@@ -143,6 +143,6 @@ class A192ttItemPipeline(object):
         return item
 
     def close_spider(self, spider):
-        self.conn.commit()
+        self.conn.commit()  # 这是一个常识问题，sql语句执行完之后需要commit之后才能在mysql数据库中看到
         self.conn.close()
         print("爬虫结束")

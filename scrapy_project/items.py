@@ -32,5 +32,5 @@ class A192ttItem(scrapy.Item):
     item = scrapy.Field()
     title = scrapy.Field()
     url = scrapy.Field()
-    name = scrapy.Field()
+    name = scrapy.Field()  # 其实就是压缩包的解压密码
     passwd = scrapy.Field()
